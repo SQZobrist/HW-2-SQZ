@@ -1,0 +1,104 @@
+Sub NextStock()
+
+    
+    Dim lastRow As Double
+    lastRow = Cells(Rows.Count, 1).End(xlUp).Row
+    
+    Dim yearEnd As Double
+    yearEnd = 0
+    
+    Dim nextStockOpen As Double
+    nextStockOpen = Cells(2, 3).Value
+    
+    Dim currentTicker As Integer
+    currentTicker = 2
+    
+    Dim currentVolume As Double
+    currentVolume = 0
+    
+    Dim gPI As Double 'greatest percent increase
+    gPI = 0
+    
+    Dim gPIref As Double
+    gPIref = 2
+    
+    Dim gPD As Double 'greatest percent decrease
+    gPD = 0
+    
+    Dim gPDref As Double
+    gPDref = 2
+    
+    Dim gTV As Double 'greatest total volume
+    gTV = 0
+    
+    Dim gTVref As Double
+    gTVref = 2
+  
+    
+    For i = 2 To lastRow
+            
+        If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then 'detects the next important row
+        
+                yearEnd = Cells(i, 6).Value
+        
+               If Cells(i + 1, 3).Value > 0 Then
+                    nextStockOpen = Cells(i + 1, 3).Value
+                Else
+                   Exit Sub 'instantly Exit Sub when it detects the next line is empty
+               
+               End If
+        
+        
+          
+          Cells(currentTicker, 9).Value = Cells(i, 1).Value 'ticker
+          Cells(currentTicker, 10).Value = nextStockOpen - yearEnd  'yearly change
+          Cells(currentTicker, 11).Value = (nextStockOpen - yearEnd) / nextStockOpen 'percent change
+            Cells(currentTicker, 12).Value = currentVolume + Cells(i, 7).Value  'volume
+        
+        
+        
+            If gPI < Cells(currentTicker, 11).Value Then 'finds gPI
+        
+                gPI = Cells(currentTicker, 11).Value
+                gPIref = currentTicker
+            
+            End If
+        
+            If gPD > Cells(currentTicker, 11).Value Then 'finds gPD
+        
+                gPD = Cells(currentTicker, 11).Value
+                gPDref = currentTicker
+            
+            End If
+        
+            If gTV < Cells(currentTicker, 12).Value Then 'finds gTV
+        
+                gTV = Cells(currentTicker, 12).Value
+                gTVref = currentTicker
+            
+            End If
+        
+            'sets the cell values on the Excel sheet
+            Cells(2, 16) = Cells(gPIref, 9).Value
+            Cells(2, 17) = gPI
+            
+            Cells(3, 16) = Cells(gPDref, 9).Value
+            Cells(3, 17) = gPD
+        
+            Cells(4, 16) = Cells(gTVref, 9).Value
+            Cells(4, 17) = gTV
+
+
+
+            currentVolume = 0
+            currentTicker = currentTicker + 1
+        
+            Else
+        
+                currentVolume = currentVolume + Cells(i, 7).Value
+      
+        End If
+        
+    Next i
+
+End Sub

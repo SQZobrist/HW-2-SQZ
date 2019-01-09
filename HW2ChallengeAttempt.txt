@@ -1,0 +1,116 @@
+Sub NextSheetStock()
+'This appears to be the right syntax but I just can't get it to run on all sheets -SZ
+
+
+For Each ws In ThisWorkbook.Worksheets
+    
+    Dim nextStockOpen As Double
+    Dim yearEnd As Double
+    Dim lastRow As Double
+    Dim currentTicker As Integer
+    Dim currentVolume As Double
+    Dim gPI As Double
+    Dim gPIref As Double
+    Dim gPD As Double
+    Dim gPDref As Double
+    Dim gTV As Double
+    Dim gTVref As Double
+    
+    
+    lastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    
+    yearEnd = 0
+    
+    nextStockOpen = ws.Cells(2, 3).Value
+    
+    currentTicker = 2
+    
+    currentVolume = 0
+    
+    
+     'greatest percent increase
+    gPI = 0
+    
+    gPIref = 2
+    
+     'greatest percent decrease
+    gPD = 0
+    
+    gPDref = 2
+    
+     'greatest total volume
+    gTV = 0
+    
+    gTVref = 2
+  
+    
+    For i = 2 To lastRow
+            
+        If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then 'detects the next important row
+        
+                yearEnd = ws.Cells(i, 6).Value
+        
+               If ws.Cells(i + 1, 3).Value > 0 Then
+                    nextStockOpen = ws.Cells(i + 1, 3).Value
+                Else
+                   Exit Sub 'instantly Exit Sub when it detects the next line is empty
+               
+               End If
+        
+        
+          
+            ws.Cells(currentTicker, 9).Value = ws.Cells(i, 1).Value 'ticker
+            ws.Cells(currentTicker, 10).Value = nextStockOpen - yearEnd  'yearly change
+            ws.Cells(currentTicker, 11).Value = (nextStockOpen - yearEnd) / nextStockOpen 'percent change
+            ws.Cells(currentTicker, 12).Value = currentVolume + ws.Cells(i, 7).Value  'volume
+        
+        
+        
+            If gPI < ws.Cells(currentTicker, 11).Value Then 'finds gPI
+        
+                gPI = ws.Cells(currentTicker, 11).Value
+                gPIref = currentTicker
+            
+            End If
+        
+            If gPD > ws.Cells(currentTicker, 11).Value Then 'finds gPD
+        
+                gPD = ws.Cells(currentTicker, 11).Value
+                gPDref = currentTicker
+            
+            End If
+        
+            If gTV < ws.Cells(currentTicker, 12).Value Then 'finds gTV
+        
+                gTV = ws.Cells(currentTicker, 12).Value
+                gTVref = currentTicker
+            
+            End If
+        
+            'sets the cell values on the Excel sheet
+            ws.Cells(2, 16) = ws.Cells(gPIref, 9).Value
+            ws.Cells(2, 17) = gPI
+            
+            ws.Cells(3, 16) = ws.Cells(gPDref, 9).Value
+            ws.Cells(3, 17) = gPD
+        
+            ws.Cells(4, 16) = ws.Cells(gTVref, 9).Value
+            ws.Cells(4, 17) = gTV
+
+
+
+            currentVolume = 0
+            currentTicker = currentTicker + 1
+        
+            Else
+        
+                currentVolume = currentVolume + ws.Cells(i, 7).Value
+      
+        End If
+        
+    Next i
+Next ws
+End Sub
+
+
+
